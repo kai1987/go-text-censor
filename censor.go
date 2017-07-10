@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"strings"
 )
@@ -15,7 +16,10 @@ type Node struct {
 	children  map[rune]*Node
 }
 
+//2000-\u206F
 var tree = STree{&Node{false, 0, make(map[rune]*Node, 1000)}}
+
+var PUNCS = allPunctuation()
 
 func (this *Node) add(n *Node) {
 	children := this.children
@@ -24,6 +28,7 @@ func (this *Node) add(n *Node) {
 	}
 
 	children[n.character] = n
+	this.children = children
 }
 
 func (this *Node) find(character rune) *Node {
@@ -35,8 +40,12 @@ func initOneWord(str string) {
 	if l <= 0 {
 		return
 	}
+	str = strings.ToLower(str)
+	runeArr := []rune(str)
+	l = len(runeArr)
 	node := tree.Root
-	for i, v := range str {
+	for i := 0; i < l; i++ {
+		v := runeArr[i]
 		next := node.find(v)
 		if next == nil {
 			next = &Node{i == l-1, v, make(map[rune]*Node)}
@@ -67,28 +76,41 @@ func CheckAndReplace(text string, replaceCharacter string) (pass bool, newText s
 }
 
 //IsPass only check. don't replace words.
-func IsPass(text string) bool {
+func IsPass(text string, strict bool) bool {
 	l := len(text)
 	if l < 1 {
 		return true
 	}
 
-	runArr := []rune(text)
+	text = strings.ToLower(text)
 
-	node := tree.Root
-	for i, j := 0, 1; i < l-1; {
-		cWord := runArr[i]
-		node = node.find(cWord)
+	runeArr := []rune(text)
+	l = len(runeArr)
+
+	for i := 0; i < l-1; i++ {
+		cWord := runeArr[i]
+		node := tree.Root.find(cWord)
+
 		if node == nil {
-			i++
-			j = i + 1
 			continue
 		}
 		if node.isEnd {
 			return false
 		}
-		nWord := runArr[j]
-		node = node.find(nWord)
+
+		for j := i + 1; j < l; j++ {
+			//如果是严格模式，将所有的标点忽略掉
+			if strict && PUNCS[runeArr[j]] {
+				continue
+			}
+			node = node.find(runeArr[j])
+			if node == nil {
+				break
+			}
+			if node.isEnd {
+				return false
+			}
+		}
 
 	}
 	return true
@@ -97,4 +119,21 @@ func IsPass(text string) bool {
 func GetTree() STree {
 	return tree
 
+}
+
+func allPunctuation() map[rune]bool {
+	str := " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~，。？；：”’￥（）——、！……"
+	m := make(map[rune]bool, len(str))
+	for _, v := range str {
+		m[v] = true
+	}
+	return m
+
+}
+
+func main() {
+	for i := 32; i < 127; i++ {
+		fmt.Print(string(rune(i)))
+	}
+	fmt.Printf("strings.ToLower = %+v\n", strings.ToLower("Ghoe中文中国"))
 }
