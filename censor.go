@@ -1,4 +1,4 @@
-package main
+package textcensor
 
 import (
 	"io/ioutil"
