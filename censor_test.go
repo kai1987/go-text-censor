@@ -69,13 +69,25 @@ func TestCheckAndReplace(t *testing.T) {
 
 }
 
+func BenchmarkIsPassShort(b *testing.B) {
+	InitWordsByPath("./censored_words.txt", false)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		IsPass("完全个苏。", true)
+	}
+}
+
 func BenchmarkIsPass(b *testing.B) {
+	InitWordsByPath("./censored_words.txt", false)
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		IsPass("中国台湾是好友友啊，不要打傣啊。", true)
 	}
 }
 
 func BenchmarkReplace(b *testing.B) {
+	InitWordsByPath("./censored_words.txt", false)
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		CheckAndReplace("中国台湾是好友友啊，不要打傣啊。你妹", true, '*')
 	}
