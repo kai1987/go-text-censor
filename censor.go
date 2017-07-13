@@ -19,10 +19,11 @@ type Node struct {
 	children  map[rune]*Node
 }
 
-var tree = STree{&Node{false, 0, make(map[rune]*Node, 1000)}}
+var tree = &STree{&Node{false, 0, make(map[rune]*Node, 1000)}}
 
 var PUNCS = getPunctuationMap(defaultPunctuation)
 
+//SetPunctuation set some punctuations you want to ignore in the strict mode
 func SetPunctuation(str string) {
 	PUNCS = getPunctuationMap(str)
 }
@@ -42,6 +43,7 @@ func (this *Node) find(character rune) *Node {
 }
 
 func initOneWord(str string, caseSensitive bool) {
+	str = strings.TrimSpace(str)
 	l := len(str)
 	if l <= 0 {
 		return
@@ -66,8 +68,8 @@ func initOneWord(str string, caseSensitive bool) {
 	}
 }
 
-//InitWords load all the censored word from path
-//caseSensitive if true 大小写敏感，即如果FUCK在敏感词库中，如果fuck没有在库中，则fuck可以通过敏感词检查。
+//InitWordsByPath load all the censored word from path
+//caseSensitive if true 大小写敏感，即如果FUCK在敏感词库中，fuck没有在库中，则fuck可以通过敏感词检查。
 //file should be like example
 func InitWordsByPath(path string, caseSensitive bool) error {
 	words, err := ioutil.ReadFile(path)
@@ -80,18 +82,22 @@ func InitWordsByPath(path string, caseSensitive bool) error {
 	return nil
 }
 
+//InitWords init the finding tree use given wordsArr
 func InitWords(wordsArr []string, caseSensitive bool) {
+	tree = &STree{&Node{false, 0, make(map[rune]*Node, 1000)}}
 	defaultCaseSensitive = caseSensitive
 	for _, v := range wordsArr {
 		initOneWord(v, caseSensitive)
 	}
 }
 
-//CheckAndReplace check the text contians bad word, if contains return a newText
+//CheckAndReplace check if the text contians bad word, if contains return a newText
 //that replaced the bad word with replaceCharacter.
-func CheckAndReplace(text string, strict bool, replaceCharacter rune) (pass bool, newText string, err error) {
+//if strict is true , some punctuations with be ignored.
+func CheckAndReplace(text string, strict bool, replaceCharacter rune) (pass bool, newText string) {
+	text = strings.TrimSpace(text)
 	if len(text) < 1 {
-		return true, text, nil
+		return true, text
 	}
 	if !defaultCaseSensitive {
 		text = strings.ToLower(text)
@@ -134,12 +140,13 @@ func CheckAndReplace(text string, strict bool, replaceCharacter rune) (pass bool
 
 	}
 
-	return pass, string(runeArr), nil
+	return pass, string(runeArr)
 }
 
 //IsPass only check. don't replace words.
 //strict if true, some Punctuation will be ignore, eg fuck f*u*c*k f^u^c^k ... can't pass.
 func IsPass(text string, strict bool) bool {
+	text = strings.TrimSpace(text)
 	if len(text) < 1 {
 		return true
 	}
@@ -176,11 +183,6 @@ func IsPass(text string, strict bool) bool {
 
 	}
 	return true
-}
-
-func GetTree() STree {
-	return tree
-
 }
 
 func getPunctuationMap(str string) map[rune]bool {
