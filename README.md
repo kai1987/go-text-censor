@@ -1,4 +1,4 @@
-# GO-Text_Censor
+# GO-Text-Censor
 
 A fast censored word check and replace package for Go.<br/>
 Support case sensitive or not .<br/>
@@ -68,7 +68,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 
 
-# GO-Text_Censor
+# GO-Text-Censor
 
 这个包用来检查或者过滤敏感词的。你懂的。
 

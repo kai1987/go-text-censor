@@ -14,12 +14,11 @@ type STree struct {
 }
 
 type Node struct {
-	isEnd     bool
-	character rune
-	children  map[rune]*Node
+	isEnd    bool
+	children map[rune]*Node
 }
 
-var tree = &STree{&Node{false, 0, make(map[rune]*Node, 1000)}}
+var tree = &STree{&Node{false, make(map[rune]*Node, 1000)}}
 
 var PUNCS = getPunctuationMap(defaultPunctuation)
 
@@ -28,14 +27,11 @@ func SetPunctuation(str string) {
 	PUNCS = getPunctuationMap(str)
 }
 
-func (this *Node) add(n *Node) {
-	children := this.children
-	if len(children) < 1 {
-		children = make(map[rune]*Node)
+func (this *Node) add(character rune, n *Node) {
+	if this.children == nil {
+		this.children = make(map[rune]*Node)
 	}
-
-	children[n.character] = n
-	this.children = children
+	this.children[character] = n
 }
 
 func (this *Node) find(character rune) *Node {
@@ -58,8 +54,9 @@ func initOneWord(str string, caseSensitive bool) {
 		v := runeArr[i]
 		next := node.find(v)
 		if next == nil {
-			next = &Node{i == l-1, v, make(map[rune]*Node)}
-			node.add(next)
+			next = &Node{}
+			//next.isEnd = i == l-1
+			node.add(v, next)
 		}
 		node = next
 		if i == l-1 {
@@ -84,7 +81,7 @@ func InitWordsByPath(path string, caseSensitive bool) error {
 
 //InitWords init the finding tree use given wordsArr
 func InitWords(wordsArr []string, caseSensitive bool) {
-	tree = &STree{&Node{false, 0, make(map[rune]*Node, 1000)}}
+	//tree = &STree{&Node{false, make(map[rune]*Node, 1000)}}
 	defaultCaseSensitive = caseSensitive
 	for _, v := range wordsArr {
 		initOneWord(v, caseSensitive)
