@@ -1,0 +1,24 @@
+node {
+  def root = tool name: 'Go1.8.3', type: 'go'
+
+    // Export environment variables pointing to the directory where Go was installed
+    withEnv(["GOROOT=${root}", "PATH+GO=${root}/bin"]) {
+        sh 'go version'
+
+
+       stage('Preparation') { // for display purposes
+          // Get some code from a GitHub repository
+
+          git 'https://github.com/kai1987/go-text-censor.git'
+
+       }
+       stage('Build') {
+          // Run the maven build
+          sh 'go build'
+
+       }
+       stage('Results') {
+          sh 'go test'
+       }
+    }
+}
