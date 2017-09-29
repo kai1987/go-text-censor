@@ -1,4 +1,7 @@
 # GO-Text-Censor
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
+[![Build Status](https://travis-ci.org/kai1987/go-text-censor.svg?branch=master)](https://travis-ci.org/kai1987/go-text-censor)
+[![Coverage Status](https://coveralls.io/repos/github/kai1987/go-text-censor/badge.svg?branch=master)](https://coveralls.io/github/kai1987/go-text-censor?branch=master)
 
 A fast censored word check and replace package for Go.<br/>
 Support case sensitive or not .<br/>
