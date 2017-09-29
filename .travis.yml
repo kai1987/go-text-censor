@@ -1,0 +1,12 @@
+sudo: false
+language: go
+go:
+  - 1.7.6
+  - 1.8.3
+  - 1.9
+  - tip
+script:
+  - go test
+
+branches:
+  only: [master]
