@@ -86,7 +86,7 @@ func TestIsPass(t *testing.T) {
 	InitWordsByPath("./censored_words.txt", false)
 	for _, v := range passTests {
 		if v.out != IsPass(v.in, v.mode) {
-			t.Errorf("str %s,mode %t should be %t , casesensitive", v.in, v.mode, v.out, defaultCaseSensitive)
+			t.Errorf("str %s,mode %t should be %t , casesensitive:%t", v.in, v.mode, v.out, defaultCaseSensitive)
 		}
 	}
 }

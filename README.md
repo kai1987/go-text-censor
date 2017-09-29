@@ -1,4 +1,5 @@
 # GO-Text-Censor
+[![GoDoc](https://godoc.org/github.com/kai1987/go-text-censor?status.svg)](https://godoc.org/github.com/kai1987/go-text-censor)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
 [![Build Status](https://travis-ci.org/kai1987/go-text-censor.svg?branch=master)](https://travis-ci.org/kai1987/go-text-censor)
 [![Coverage Status](https://coveralls.io/repos/github/kai1987/go-text-censor/badge.svg?branch=master)](https://coveralls.io/github/kai1987/go-text-censor?branch=master)
