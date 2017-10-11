@@ -9,33 +9,33 @@ var defaultPunctuation = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~，。？；：”�
 
 var defaultCaseSensitive = false
 
-type STree struct {
-	Root *Node
+type sTree struct {
+	Root *runeNode
 }
 
-type Node struct {
+type runeNode struct {
 	isEnd    bool
-	children map[rune]*Node
+	children map[rune]*runeNode
 }
 
-var tree = &STree{&Node{false, make(map[rune]*Node, 1000)}}
+var tree = &sTree{&runeNode{false, make(map[rune]*runeNode, 1000)}}
 
-var PUNCS = getPunctuationMap(defaultPunctuation)
+var punctuations = getPunctuationMap(defaultPunctuation)
 
 //SetPunctuation set some punctuations you want to ignore in the strict mode
 func SetPunctuation(str string) {
-	PUNCS = getPunctuationMap(str)
+	punctuations = getPunctuationMap(str)
 }
 
-func (this *Node) add(character rune, n *Node) {
-	if this.children == nil {
-		this.children = make(map[rune]*Node)
+func (rNode *runeNode) add(character rune, n *runeNode) {
+	if rNode.children == nil {
+		rNode.children = make(map[rune]*runeNode)
 	}
-	this.children[character] = n
+	rNode.children[character] = n
 }
 
-func (this *Node) find(character rune) *Node {
-	return this.children[character]
+func (rNode *runeNode) find(character rune) *runeNode {
+	return rNode.children[character]
 }
 
 func initOneWord(str string, caseSensitive bool) {
@@ -54,7 +54,7 @@ func initOneWord(str string, caseSensitive bool) {
 		v := runeArr[i]
 		next := node.find(v)
 		if next == nil {
-			next = &Node{}
+			next = &runeNode{}
 			//next.isEnd = i == l-1
 			node.add(v, next)
 		}
@@ -120,7 +120,7 @@ func CheckAndReplace(text string, strict bool, replaceCharacter rune) (pass bool
 
 		for j := i + 1; j < l; j++ {
 			//如果是严格模式，将所有的标点忽略掉
-			if strict && PUNCS[runeArr[j]] {
+			if strict && punctuations[runeArr[j]] {
 				continue
 			}
 			node = node.find(runeArr[j])
@@ -166,7 +166,7 @@ func IsPass(text string, strict bool) bool {
 
 		for j := i + 1; j < l; j++ {
 			//如果是严格模式，将所有的标点忽略掉
-			if strict && PUNCS[runeArr[j]] {
+			if strict && punctuations[runeArr[j]] {
 				continue
 			}
 			node = node.find(runeArr[j])
