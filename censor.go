@@ -127,10 +127,11 @@ func CheckAndReplace(text string, strict bool, replaceCharacter rune) (pass bool
 
 		for j := i + 1; j < l; j++ {
 			//如果是严格模式，将所有的标点忽略掉
-			if strict && punctuations[runeArr[j]] {
+			nextNode := node.find(runeArr[j])
+			if nextNode == nil && strict && punctuations[runeArr[j]] {
 				continue
 			}
-			node = node.find(runeArr[j])
+			node = nextNode
 			if node == nil {
 				break
 			}
@@ -173,10 +174,11 @@ func IsPass(text string, strict bool) bool {
 
 		for j := i + 1; j < l; j++ {
 			//如果是严格模式，将所有的标点忽略掉
-			if strict && punctuations[runeArr[j]] {
+			nextNode := node.find(runeArr[j])
+			if nextNode == nil && strict && punctuations[runeArr[j]] {
 				continue
 			}
-			node = node.find(runeArr[j])
+			node = nextNode
 			if node == nil {
 				break
 			}
