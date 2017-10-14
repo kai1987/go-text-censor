@@ -1,6 +1,7 @@
 package textcensor
 
 import (
+	"fmt"
 	"io/ioutil"
 	"strings"
 )
@@ -8,6 +9,8 @@ import (
 var defaultPunctuation = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~，。？；：”’￥（）——、！……"
 
 var defaultCaseSensitive = false
+
+const bomHead = 65279
 
 type sTree struct {
 	Root *runeNode
@@ -52,6 +55,10 @@ func initOneWord(str string, caseSensitive bool) {
 	node := tree.Root
 	for i := 0; i < l; i++ {
 		v := runeArr[i]
+		if v == bomHead {
+			fmt.Printf("bomHead = %+v\n", bomHead)
+			continue
+		}
 		next := node.find(v)
 		if next == nil {
 			next = &runeNode{}

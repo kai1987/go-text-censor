@@ -26,6 +26,7 @@ var passTests = []struct {
 	{"", true, true},
 	{"操场", true, false},
 	{"操", true, false},
+	{"毛泽东", true, false},
 	{"f    u  ck", true, false},
 }
 
