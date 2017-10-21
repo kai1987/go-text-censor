@@ -1,7 +1,6 @@
 package textcensor
 
 import (
-	"fmt"
 	"io/ioutil"
 	"strings"
 )
@@ -56,7 +55,7 @@ func initOneWord(str string, caseSensitive bool) {
 	for i := 0; i < l; i++ {
 		v := runeArr[i]
 		if v == bomHead {
-			fmt.Printf("bomHead = %+v\n", bomHead)
+			//fmt.Printf("bomHead = %+v\n", bomHead)
 			continue
 		}
 		next := node.find(v)
