@@ -61,7 +61,6 @@ func initOneWord(str string, caseSensitive bool) {
 		next := node.find(v)
 		if next == nil {
 			next = &runeNode{}
-			//next.isEnd = i == l-1
 			node.add(v, next)
 		}
 		node = next
@@ -104,7 +103,6 @@ func CheckAndReplace(text string, strict bool, replaceCharacter rune) (pass bool
 	}
 	if !defaultCaseSensitive {
 		text = strings.ToLower(text)
-
 	}
 	runeArr := []rune(text)
 	l := len(runeArr)
