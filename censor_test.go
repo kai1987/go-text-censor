@@ -87,6 +87,7 @@ var crTestsWithSetPunctuation = []struct {
 	{"习i猪i头", true, '-', false, "-----"},
 	{"习i猪i头不好", true, '-', false, "-----不好"},
 	{"fuckaaa", true, '-', false, "----aaa"},
+	{"fuckAAA", true, '-', false, "----AAA"},
 	{"fiiuaackaaa", true, '-', false, "--------aaa"},
 	{"fuckbdfiiuaackaaa", true, '-', false, "----bd--------aaa"},
 }

@@ -101,14 +101,15 @@ func CheckAndReplace(text string, strict bool, replaceCharacter rune) (pass bool
 	if len(text) < 1 {
 		return true, text
 	}
+	originText := text
 	if !defaultCaseSensitive {
 		text = strings.ToLower(text)
 	}
 	runeArr := []rune(text)
+	originRuneArr := []rune(originText)
 	l := len(runeArr)
 
 	pass = true
-
 	for i := 0; i < l; i++ {
 		cWord := runeArr[i]
 		node := tree.Root.find(cWord)
@@ -117,7 +118,7 @@ func CheckAndReplace(text string, strict bool, replaceCharacter rune) (pass bool
 			continue
 		}
 		if node.isEnd {
-			runeArr[i] = replaceCharacter
+			originRuneArr[i] = replaceCharacter
 			pass = false
 			continue
 		}
@@ -134,7 +135,7 @@ func CheckAndReplace(text string, strict bool, replaceCharacter rune) (pass bool
 			}
 			if node.isEnd {
 				for ri := i; ri <= j; ri++ {
-					runeArr[ri] = replaceCharacter
+					originRuneArr[ri] = replaceCharacter
 					pass = false
 				}
 			}
@@ -142,7 +143,7 @@ func CheckAndReplace(text string, strict bool, replaceCharacter rune) (pass bool
 
 	}
 
-	return pass, string(runeArr)
+	return pass, string(originRuneArr)
 }
 
 //IsPass only check. don't replace words.
