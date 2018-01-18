@@ -96,6 +96,10 @@ func TestInitWordsByPath(t *testing.T) {
 	if err == nil {
 		t.Errorf("init not exist file should have err")
 	}
+	err = InitWordsByPath("./censored_words_bom.txt", false)
+	if err != nil {
+		t.Errorf("init file with bom head should success")
+	}
 }
 
 func TestIsPass(t *testing.T) {
