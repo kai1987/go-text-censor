@@ -45,6 +45,24 @@ var crTests = []struct {
 	{"", false, '-', true, ""},
 }
 
+var crTestsCaseSensitive = []struct {
+	in   string
+	mode bool
+	rpc  rune
+	pass bool
+	out  string
+}{
+	{"你好", true, '*', true, "你好"},
+	{"你好操ni", true, '*', false, "你好*ni"},
+	{"你好你**妹ni", true, '*', false, "你好****ni"},
+	{"你好你**妹ni", false, '*', true, "你好你**妹ni"},
+	{"操", false, '-', false, "-"},
+	{"fuCK", false, '-', true, "fuCK"},
+	{"Hello", false, '-', true, "Hello"},
+	{"fuck", false, '-', false, "----"},
+	{"", false, '-', true, ""},
+}
+
 var passTestsCaseSensitive = []struct {
 	in   string
 	mode bool
@@ -140,8 +158,18 @@ func TestCheckAndReplace(t *testing.T) {
 			t.Errorf("message ,v:%v,got:pass:%v,out:%v", v, pass, out)
 		}
 	}
-
 }
+
+func TestCheckAndReplaceCaseSensitive(t *testing.T) {
+	InitWordsByPath("./censored_words.txt", true)
+	for _, v := range crTestsCaseSensitive {
+		pass, out := CheckAndReplace(v.in, v.mode, v.rpc)
+		if pass != v.pass || out != v.out {
+			t.Errorf("message ,v:%v,got:pass:%v,out:%v", v, pass, out)
+		}
+	}
+}
+
 func TestCheckAndReplaceSetPunctuation(t *testing.T) {
 	InitWordsByPath("./censored_words.txt", false)
 	defaultPunctuation := "abcdefghijklmnopqrstuvwxyz !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~，。？；：”’￥（）——、！……"
