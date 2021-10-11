@@ -3,6 +3,7 @@ package textcensor
 import (
 	"io/ioutil"
 	"strings"
+	"sync"
 )
 
 var defaultPunctuation = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~，。？；：”’￥（）——、！……"
@@ -12,6 +13,7 @@ var defaultCaseSensitive = false
 const bomHead = 65279
 
 type sTree struct {
+	Lock sync.RWMutex
 	Root *runeNode
 }
 
@@ -20,13 +22,28 @@ type runeNode struct {
 	children map[rune]*runeNode
 }
 
-var tree = &sTree{&runeNode{false, make(map[rune]*runeNode, 1000)}}
+var tree sTree = sTree{Root: &runeNode{false, make(map[rune]*runeNode, 1000)}}
 
 var punctuations = getPunctuationMap(defaultPunctuation)
 
 //SetPunctuation set some punctuations you want to ignore in the strict mode
 func SetPunctuation(str string) {
 	punctuations = getPunctuationMap(str)
+}
+
+func ResetWord() error {
+	tree.Lock.Lock()
+	defer tree.Lock.Unlock()
+
+	tree.Root = &runeNode{false, make(map[rune]*runeNode, 1000)}
+	return nil
+}
+
+func GetCurrentTreeNode() *runeNode {
+	tree.Lock.Lock()
+	defer tree.Lock.Unlock()
+
+	return tree.Root
 }
 
 func (rNode *runeNode) add(character rune, n *runeNode) {
@@ -41,6 +58,9 @@ func (rNode *runeNode) find(character rune) *runeNode {
 }
 
 func initOneWord(str string, caseSensitive bool) {
+	tree.Lock.Lock()
+	defer tree.Lock.Unlock()
+
 	str = strings.TrimSpace(str)
 	l := len(str)
 	if l <= 0 {
@@ -96,7 +116,7 @@ func InitWords(wordsArr []string, caseSensitive bool) {
 //CheckAndReplace check if the text contians bad word, if contains return a newText
 //that replaced the bad word with replaceCharacter.
 //if strict is true , some punctuations with be ignored.
-func CheckAndReplace(text string, strict bool, replaceCharacter rune) (pass bool, newText string) {
+func (Root *runeNode) CheckAndReplace(text string, strict bool, replaceCharacter rune) (pass bool, newText string) {
 	text = strings.TrimSpace(text)
 	if len(text) < 1 {
 		return true, text
@@ -112,7 +132,7 @@ func CheckAndReplace(text string, strict bool, replaceCharacter rune) (pass bool
 	pass = true
 	for i := 0; i < l; i++ {
 		cWord := runeArr[i]
-		node := tree.Root.find(cWord)
+		node := Root.find(cWord)
 
 		if node == nil {
 			continue
@@ -148,7 +168,7 @@ func CheckAndReplace(text string, strict bool, replaceCharacter rune) (pass bool
 
 //IsPass only check. don't replace words.
 //strict if true, some Punctuation will be ignore, eg fuck f*u*c*k f^u^c^k ... can't pass.
-func IsPass(text string, strict bool) bool {
+func (Root *runeNode) IsPass(text string, strict bool) bool {
 	text = strings.TrimSpace(text)
 	if len(text) < 1 {
 		return true
@@ -161,7 +181,7 @@ func IsPass(text string, strict bool) bool {
 
 	for i := 0; i < l; i++ {
 		cWord := runeArr[i]
-		node := tree.Root.find(cWord)
+		node := Root.find(cWord)
 
 		if node == nil {
 			continue
@@ -171,7 +191,6 @@ func IsPass(text string, strict bool) bool {
 		}
 
 		for j := i + 1; j < l; j++ {
-			//如果是严格模式，将所有的标点忽略掉
 			nextNode := node.find(runeArr[j])
 			if nextNode == nil && strict && punctuations[runeArr[j]] {
 				continue

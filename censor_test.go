@@ -111,7 +111,7 @@ var crTestsWithSetPunctuation = []struct {
 }
 
 func TestInitWordsByPath(t *testing.T) {
-	err := InitWordsByPath("./not_exist.txt", false)
+	err := InitWordsByPath("./censored_not_exists.txt", false)
 	if err == nil {
 		t.Errorf("init not exist file should have err")
 	}
@@ -124,7 +124,7 @@ func TestInitWordsByPath(t *testing.T) {
 func TestIsPass(t *testing.T) {
 	InitWordsByPath("./censored_words.txt", false)
 	for _, v := range passTests {
-		if v.out != IsPass(v.in, v.mode) {
+		if v.out != GetCurrentTreeNode().IsPass(v.in, v.mode) {
 			t.Errorf("str %s,mode %t should be %t , casesensitive:%t", v.in, v.mode, v.out, defaultCaseSensitive)
 		}
 	}
@@ -133,7 +133,7 @@ func TestIsPass(t *testing.T) {
 func TestIsPassCaseSensitive(t *testing.T) {
 	InitWordsByPath("./censored_words.txt", true)
 	for _, v := range passTestsCaseSensitive {
-		if v.out != IsPass(v.in, v.mode) {
+		if v.out != GetCurrentTreeNode().IsPass(v.in, v.mode) {
 			t.Errorf("str %s,mode %t should be %t", v.in, v.mode, v.out)
 		}
 	}
@@ -144,7 +144,7 @@ func TestIsPassPunctuation(t *testing.T) {
 	defaultPunctuation := "abcdefghijklmnopqrstuvwxyz !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~，。？；：”’￥（）——、！……"
 	SetPunctuation(defaultPunctuation)
 	for _, v := range passTestsPunctuation {
-		if v.out != IsPass(v.in, v.mode) {
+		if v.out != GetCurrentTreeNode().IsPass(v.in, v.mode) {
 			t.Errorf("str %s,mode %t should be %t", v.in, v.mode, v.out)
 		}
 	}
@@ -153,7 +153,7 @@ func TestIsPassPunctuation(t *testing.T) {
 func TestCheckAndReplace(t *testing.T) {
 	InitWordsByPath("./censored_words.txt", false)
 	for _, v := range crTests {
-		pass, out := CheckAndReplace(v.in, v.mode, v.rpc)
+		pass, out := GetCurrentTreeNode().CheckAndReplace(v.in, v.mode, v.rpc)
 		if pass != v.pass || out != v.out {
 			t.Errorf("message ,v:%v,got:pass:%v,out:%v", v, pass, out)
 		}
@@ -163,7 +163,7 @@ func TestCheckAndReplace(t *testing.T) {
 func TestCheckAndReplaceCaseSensitive(t *testing.T) {
 	InitWordsByPath("./censored_words.txt", true)
 	for _, v := range crTestsCaseSensitive {
-		pass, out := CheckAndReplace(v.in, v.mode, v.rpc)
+		pass, out := GetCurrentTreeNode().CheckAndReplace(v.in, v.mode, v.rpc)
 		if pass != v.pass || out != v.out {
 			t.Errorf("message ,v:%v,got:pass:%v,out:%v", v, pass, out)
 		}
@@ -175,7 +175,7 @@ func TestCheckAndReplaceSetPunctuation(t *testing.T) {
 	defaultPunctuation := "abcdefghijklmnopqrstuvwxyz !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~，。？；：”’￥（）——、！……"
 	SetPunctuation(defaultPunctuation)
 	for _, v := range crTestsWithSetPunctuation {
-		pass, out := CheckAndReplace(v.in, v.mode, v.rpc)
+		pass, out := GetCurrentTreeNode().CheckAndReplace(v.in, v.mode, v.rpc)
 		if pass != v.pass || out != v.out {
 			t.Errorf("message ,v:%v,got:pass:%v,out:%v", v, pass, out)
 		}
@@ -188,7 +188,7 @@ func BenchmarkIsPassShort(b *testing.B) {
 	InitWordsByPath("./censored_words.txt", false)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		IsPass("完全个苏。", true)
+		GetCurrentTreeNode().IsPass("完全个苏。", true)
 	}
 }
 
@@ -196,7 +196,7 @@ func BenchmarkIsPass(b *testing.B) {
 	InitWordsByPath("./censored_words.txt", false)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		IsPass("中国台湾是好友友啊，不要打傣啊。", true)
+		GetCurrentTreeNode().IsPass("中国台湾是好友友啊，不要打傣啊。", true)
 	}
 }
 
@@ -204,7 +204,7 @@ func BenchmarkReplace(b *testing.B) {
 	InitWordsByPath("./censored_words.txt", false)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		CheckAndReplace("中国台湾是好友友啊，不要打傣啊。你妹", true, '*')
+		GetCurrentTreeNode().CheckAndReplace("中国台湾是好友友啊，不要打傣啊。你妹", true, '*')
 	}
 }
 
@@ -212,7 +212,7 @@ func BenchmarkReplaceLong(b *testing.B) {
 	InitWordsByPath("./censored_words.txt", false)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		CheckAndReplace(`中国台湾是好友友啊，不要打傣啊。你妹,,回来不是再开发布会，也不必写公开信，也不用再讲梦想，而是把“蒙眼狂奔”后的眼罩摘下来，认真地协助现有的管理层处理当前危机。你可以做的事情真的很多。
+		GetCurrentTreeNode().CheckAndReplace(`中国台湾是好友友啊，不要打傣啊。你妹,,回来不是再开发布会，也不必写公开信，也不用再讲梦想，而是把“蒙眼狂奔”后的眼罩摘下来，认真地协助现有的管理层处理当前危机。你可以做的事情真的很多。
 		比如：梳理乐视系的所有业务条线，有价值者存之，业已败坏者弃之，让造血机制尽快恢复；比如：与乐视的所有债主和供应商见面——哪怕被他们咬死，也要在保镖的卫护下与他们一起坐下来，探讨尽善事宜，解决所有浮现的危机和可能存在的隐患。
 		特别是那几位借钱给你的长江商学院同学，你不能让一息尚存的同学情谊和江湖意气也遭遇背叛。
 		更重要的是，回来安抚和安顿每一位乐视的员工。`, true, '*')
